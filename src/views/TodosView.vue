@@ -3,6 +3,7 @@ import { onMounted, ref, watch } from 'vue';
 import { uid } from 'uid'
 import { Icon } from '@iconify/vue'
 import TodoCreator from '../components/TodoCreator.vue'
+import Selector from '../components/Selector.vue'
 import TodoItem from '../components/TodoItem.vue'
 const todoList = ref([])
 
@@ -53,6 +54,9 @@ onMounted(loadTodos)
   <main>
     <h1>Create Todo</h1>
     <TodoCreator @create-todo="createTodo" />
+    <div v-if="todoList.length > 0">
+      <Selector />
+    </div>
     <ul class="todo-list" v-if="todoList.length > 0">
       <!-- Need to pass props down to the todoItem (:todo="todo") -->
       <TodoItem v-for="(todo, index) in todoList" :key="todo.id" :todo="todo" :index="index"
