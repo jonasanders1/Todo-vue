@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps } from 'vue';
+import { ref } from 'vue';
 import { Icon } from '@iconify/vue'
 // Let the TodoItem accept props passed down from parent component
 const props = defineProps({
@@ -13,24 +13,28 @@ const props = defineProps({
   }
 })
 
-defineEmits(['toggle-complete'])
+const emit = defineEmits(['toggle-complete', 'toggle-editing', 'update-todo', 'delete-todo'])
 
+const updateTodo = (todo) => {
+  emit('update-todo', props.index, todo)
+}
 </script>
+
 <template>
   <li>
     <input type="checkbox" 
     :checked="todo.isCompleted" 
     @input="$emit('toggle-complete', index)">
     <div class="todo">
-      <input v-if="todo.IsEditing" type="text" :value="todo.todo">
-      <span v-else>
+      <input v-if="todo.isEditing" type="text" v-model="todo.todo">
+      <span v-else :class="todo.isCompleted ? 'completed' : ''">
         {{ todo.todo }}
       </span>
     </div>
     <div class="todo-actions">
-      <Icon v-if="todo.IsEditing" icon="ph:check-circle" class="icon" color="#41b080" width="22" />
-      <Icon v-else icon="ph:pencil-fill" class="icon" color="#41b080" width="22" />
-      <Icon icon="ph:trash" class="icon" color="#f95e5e" width="22" />
+      <Icon v-if="todo.isEditing" icon="ph:check-circle" class="icon" color="#41b080" width="22" @click="updateTodo(todo.todo)"/>
+      <Icon v-else icon="ph:pencil-fill" class="icon" color="#41b080" width="22" @click="$emit('toggle-editing', index)"/>
+      <Icon icon="ph:trash" class="icon" color="#f95e5e" width="22" @click="$emit('delete-todo')"/>
     </div>
   </li>
 </template>
@@ -65,12 +69,15 @@ li {
 
   .todo {
     flex: 1;
-
     input[type="text"] {
       width: 100%;
       padding: 2px 6px;
       border: 2px solid #41b080;
     }
+  }
+
+  .completed{
+    text-decoration: line-through;
   }
 
   .todo-actions {
